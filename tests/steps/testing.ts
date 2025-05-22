@@ -25,7 +25,6 @@ import { expect } from "@playwright/test";
 // });
 
 Given("I am on the homepage", async function() {
-  // this.page = await this.browser.newPage();
   await this.page.goto("http://localhost:5173/", { waitUntil: "load" });
 });
 
