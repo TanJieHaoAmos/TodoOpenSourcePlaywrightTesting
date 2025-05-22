@@ -20,7 +20,7 @@ test.describe('Todo App', () => {
 
     // In this test, we will fill the new todo input and submit the for,
 
-    // tjis creates a new todo in the list
+    // this creates a new todo in the list
 
     //The test will check and confirm that a new todo with the text entered above has
 

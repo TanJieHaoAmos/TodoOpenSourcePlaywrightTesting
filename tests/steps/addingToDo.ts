@@ -1,4 +1,4 @@
-import { Given, Then } from "@cucumber/cucumber";
+import { Then, When } from "@cucumber/cucumber";
 import { expect } from "@playwright/test";
 // import type { Page, Browser } from "@playwright/test";
 
@@ -24,11 +24,16 @@ import { expect } from "@playwright/test";
 //   await browser.close();
 // });
 
-Given("I am on the homepage", async function() {
-  // this.page = await this.browser.newPage();
-  await this.page.goto("http://localhost:5173/", { waitUntil: "load" });
+// Given("I have loaded my homepage", async () => {
+//   page = await browser.newPage();
+//   await page.goto("http://localhost:5173/", { waitUntil: "load" });
+// });
+
+When("I add a ToDo", { timeout: 10000 }, async function() {
+  await this.page.fill('//input', "Adding a sample ToDo");
+  await this.page.click('button[type="submit"]');
 });
 
-Then("I should see ToDo", async function() {
-  await expect(this.page.locator("//h1")).toHaveText("Todo List");
+Then("I should see ToDo added", { timeout: 10000 }, async function() {
+  await expect(this.page.locator('li')).toContainText('Adding a sample ToDo');
 });
