@@ -10,3 +10,8 @@ Feature: ToDo List
   Scenario: Adding ToDo
     When I add a ToDo
     Then I should see ToDo added
+
+  Scenario: Filtering ToDo
+    When I add a ToDo
+    And I complete the ToDo
+    Then I should see the ToDo under Completed
