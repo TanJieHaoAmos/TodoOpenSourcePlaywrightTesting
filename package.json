@@ -9,7 +9,10 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test:e2e": "playwright test",
-    "test": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js features/**/*.feature --tags=@chromium"
+    "test:alld": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js",
+    "test:chromium": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js --tags=@chromium",
+    "test:firefox": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js --tags=@firefox",
+    "test:webkit": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js --tags=@webkit"
   },
   "dependencies": {
     "react": "^19.1.0",
