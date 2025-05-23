@@ -6,6 +6,7 @@ Feature: ToDo List
 
   Scenario: Accessing ToDo HomePage
     Then I should see ToDo
+    Then the response status code should be 200
 
   Scenario: Adding ToDo
     When I add a ToDo

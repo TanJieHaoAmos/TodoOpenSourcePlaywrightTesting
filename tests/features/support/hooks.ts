@@ -1,12 +1,23 @@
-// features/support/hooks.js
-import { After, Before, BeforeAll, AfterAll, setDefaultTimeout } from "@cucumber/cucumber";
+import {
+  After,
+  Before,
+  BeforeAll,
+  AfterAll,
+  setDefaultTimeout,
+} from "@cucumber/cucumber";
 import { chromium, firefox, webkit } from "@playwright/test";
-import type { Browser } from "@playwright/test";
+import type { Browser, Page, APIRequestContext, APIResponse} from "@playwright/test";
 
-// Use 'let' to declare browser and page globally within this hook file
-// so they can be accessed by the 'this' context in step definitions.
 let browser: Browser;
-// let page: Page;
+
+declare module "@cucumber/cucumber" {
+  interface World {
+    page: Page;
+    browser: import("@playwright/test").Browser; // Explicitly type browser if not in scope
+    apiContext: APIRequestContext;
+    apiResponse?: APIResponse; // '?' makes it optional, as it might not be set in every step
+  }
+}
 
 // Set a default timeout for all steps/hooks if not already in cucumber.js
 setDefaultTimeout(60 * 1000); // Example: 60 seconds (60000ms) for all steps/hooks
@@ -20,7 +31,8 @@ BeforeAll(async function () {
 
 // AfterAll runs once after all scenarios
 AfterAll(async function () {
-  if (browser) { // Ensure browser exists before closing
+  if (browser) {
+    // Ensure browser exists before closing
     await browser.close();
   }
 });
@@ -31,25 +43,30 @@ AfterAll(async function () {
 
 Before({ tags: "@chromium" }, async function () {
   browser = await chromium.launch({ headless: false });
-  this.page = await browser.newPage(); // Attach to 'this'
-  this.browser = browser; // Attach browser to 'this' for potential use in steps
+  this.page = await browser.newPage();
+  this.browser = browser;
+  this.apiContext = this.page.context().request;
 });
 
 Before({ tags: "@firefox" }, async function () {
   browser = await firefox.launch({ headless: false });
-  this.page = await browser.newPage(); // Attach to 'this'
+  this.page = await browser.newPage();
   this.browser = browser;
+  this.apiContext = this.page.context().request;
 });
 
 Before({ tags: "@webkit" }, async function () {
   browser = await webkit.launch({ headless: false });
-  this.page = await browser.newPage(); // Attach to 'this'
+  this.page = await browser.newPage();
   this.browser = browser;
+  this.apiContext = this.page.context().request;
 });
 
-// After hook to close the page after each scenario (if it was opened)
 After(async function () {
-  if (this.page) { // Ensure page exists before closing
+  if (this.page) {
     await this.page.close();
+  }
+  if (this.browser) {
+    await this.browser.close();
   }
 });
