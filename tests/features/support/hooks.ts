@@ -16,6 +16,7 @@ declare module "@cucumber/cucumber" {
     browser: import("@playwright/test").Browser; // Explicitly type browser if not in scope
     apiContext: APIRequestContext;
     apiResponse?: APIResponse; // '?' makes it optional, as it might not be set in every step
+    serverUrl: string;
   }
 }
 
