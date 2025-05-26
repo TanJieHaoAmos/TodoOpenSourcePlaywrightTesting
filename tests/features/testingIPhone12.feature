@@ -1,4 +1,4 @@
-@webkit
+@iphone12
 Feature: ToDo List
 
   Background:

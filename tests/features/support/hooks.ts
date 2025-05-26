@@ -4,63 +4,76 @@ import {
   BeforeAll,
   AfterAll,
   setDefaultTimeout,
+  World,
 } from "@cucumber/cucumber";
-import { chromium, firefox, webkit } from "@playwright/test";
-import type { Browser, Page, APIRequestContext, APIResponse} from "@playwright/test";
-
-let browser: Browser;
+import { chromium, firefox, webkit, devices } from "@playwright/test";
+import type {
+  Page,
+  APIRequestContext,
+  APIResponse,
+  BrowserContextOptions,
+  Browser
+} from "@playwright/test";
 
 declare module "@cucumber/cucumber" {
   interface World {
     page: Page;
-    browser: import("@playwright/test").Browser; // Explicitly type browser if not in scope
+    browser: Browser; 
     apiContext: APIRequestContext;
     apiResponse?: APIResponse; // '?' makes it optional, as it might not be set in every step
     serverUrl: string;
   }
 }
 
-// Set a default timeout for all steps/hooks if not already in cucumber.js
-setDefaultTimeout(60 * 1000); // Example: 60 seconds (60000ms) for all steps/hooks
+setDefaultTimeout(60 * 1000);
 
-// BeforeAll runs once before all scenarios
-BeforeAll(async function () {
-  // You might want to launch a default browser here, or
-  // let the specific @tag Before hooks handle it.
-  // For simplicity, we'll keep browser launch in Before for tagged scenarios.
-});
+BeforeAll(async function () {});
+AfterAll(async function () {});
 
-// AfterAll runs once after all scenarios
-AfterAll(async function () {
-  if (browser) {
-    // Ensure browser exists before closing
-    await browser.close();
-  }
-});
+async function setupChromiumDeviceBrowser(
+  this: World,
+  deviceName: keyof typeof devices
+) {
+  // Always launch Chromium for device emulation
+  this.browser = await chromium.launch({ headless: false });
 
-// Before hooks for specific browsers
-// Crucially, attach 'page' and 'browser' to the Cucumber 'this' context.
-// This ensures they are accessible in your step definitions.
+  const device = devices[deviceName];
+
+  const contextOptions: BrowserContextOptions = {
+    ...device,
+    locale: "en-US",
+  };
+
+  const context = await this.browser.newContext(contextOptions);
+
+  this.page = await context.newPage();
+  this.apiContext = this.page.context().request;
+}
 
 Before({ tags: "@chromium" }, async function () {
-  browser = await chromium.launch({ headless: false });
-  this.page = await browser.newPage();
-  this.browser = browser;
+  this.browser = await chromium.launch({ headless: false });
+  this.page = await this.browser.newPage();
   this.apiContext = this.page.context().request;
 });
 
 Before({ tags: "@firefox" }, async function () {
-  browser = await firefox.launch({ headless: false });
-  this.page = await browser.newPage();
-  this.browser = browser;
+  this.browser = await firefox.launch({ headless: false });
+  this.page = await this.browser.newPage();
   this.apiContext = this.page.context().request;
 });
 
 Before({ tags: "@webkit" }, async function () {
-  browser = await webkit.launch({ headless: false });
-  this.page = await browser.newPage();
-  this.browser = browser;
+  this.browser = await webkit.launch({ headless: false });
+  this.page = await this.browser.newPage();
   this.apiContext = this.page.context().request;
+});
+
+Before({ tags: "@pixel5" }, async function (this: World) { 
+  await setupChromiumDeviceBrowser.call(this, "Pixel 5");
+});
+
+Before({ tags: "@iphone12" }, async function (this: World) {
+  await setupChromiumDeviceBrowser.call(this, "iPhone 12");
 });
 
 After(async function () {

@@ -1,4 +1,4 @@
-@webkit
+@pixel5
 Feature: ToDo List
 
   Background:

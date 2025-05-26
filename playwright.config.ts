@@ -1,59 +1,59 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
+  testDir: "./tests",
 
- testDir: "./tests",
+  fullyParallel: true,
 
- fullyParallel: true,
+  forbidOnly: !!process.env.CI,
 
- forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
 
- retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
 
- workers: process.env.CI ? 1 : undefined,
+  reporter: "html",
 
- reporter: "html",
+  use: {
+    headless: false,
 
- use: {
+      baseURL: "http://localhost:5173",
 
- headless: false,
+    trace: "on-first-retry",
+  },
 
-//  baseURL: "http://localhost:5173",
+  projects: [
+    {
+      name: "chromium",
 
- trace: "on-first-retry",
+      use: { ...devices["Desktop Chrome"] },
+    },
 
- },
+    {
+      name: "firefox",
 
-//  projects: [
+      use: { ...devices["Desktop Firefox"] },
+    },
 
-//  {
+    {
+      name: "safari",
 
-//  name: "chromium",
+      use: { ...devices["Desktop Safari"] },
+    },
 
-//  use: { ...devices["Desktop Chrome"] },
+    {
+      name: "edge",
 
-//  },
+      use: { ...devices["Desktop Edge"] },
+    },
 
-//  {
-
-//  name: "firefox",
-
-//  use: { ...devices["Desktop Firefox"] },
-
-//  },
-
-//  {
-//  name: "safari",
-
-//  use: { ...devices["Desktop Safari"]}
-//  },
-
-//  {
-//  name: "edge",
-
-//  use: { ...devices["Desktop Edge"]}
-//  }
-
-//  ],
-
+    /* Test against mobile viewports. */
+    {
+      name: "Mobile Chrome",
+      use: { ...devices["Pixel 5"] },
+    },
+    {
+      name: "Mobile Safari",
+      use: { ...devices["iPhone 12"] },
+    },
+  ],
 });

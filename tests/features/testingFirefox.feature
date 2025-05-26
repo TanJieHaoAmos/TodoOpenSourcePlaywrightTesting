@@ -1,4 +1,4 @@
-@chromium
+@firefox
 Feature: ToDo List
 
   Background:
