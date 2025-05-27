@@ -2,7 +2,6 @@
 Feature: ToDo List
 
   Background:
-    # Given I am on the homepage
     Given I have a web server URL "http://localhost:5173"
     When I attempt to access the web server
 
