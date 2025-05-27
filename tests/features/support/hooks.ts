@@ -29,6 +29,8 @@ declare module "@cucumber/cucumber" {
     apiResponse?: APIResponse;
     serverUrl: string;
     browserName: string;
+    // Store the video path to access it in the After hook
+    videoPath?: string;
   }
 }
 
@@ -62,10 +64,13 @@ async function setupBrowserAndContext(
   browserType: typeof chromium | typeof firefox | typeof webkit,
   contextOptions: BrowserContextOptions = {}
 ) {
-  this.browser = await browserType.launch({ headless: false }); // Set to true for CI/CD
+  this.browser = await browserType.launch({
+    headless: false, // Set to true for CI/CD, false to see the browser
+    slowMo: 1000, // Slow down by 1000 milliseconds (1 second)
+  });
   this.context = await this.browser.newContext({
     ...contextOptions,
-    // recordVideo: { dir: videosDir }, // Configure video recording
+    recordVideo: { dir: videosDir }, // Configure video recording to the 'videosDir'
     locale: "en-US", // Set locale in context options for consistency
   });
   this.page = await this.context.newPage();
@@ -76,7 +81,7 @@ async function setupBrowserAndContext(
 async function setupDeviceBrowser(
   this: World,
   browserType: typeof chromium | typeof firefox | typeof webkit,
-  deviceName: keyof typeof devices  
+  deviceName: keyof typeof devices
 ) {
   const device = devices[deviceName];
   const contextOptions: BrowserContextOptions = {
@@ -114,39 +119,68 @@ Before({ tags: "@iphone12" }, async function (this: World) {
 
 // After hook to handle cleanup and attach artifacts
 After(async function (scenario) {
-  // Only capture screenshots and videos if the scenario failed
+  // Generate timestamp and status prefix for consistent naming
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = (now.getMonth() + 1).toString().padStart(2, "0");
+  const day = now.getDate().toString().padStart(2, "0");
+  const hours = now.getHours().toString().padStart(2, "0");
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+  const seconds = now.getSeconds().toString().padStart(2, "0");
+  const formattedDateTime = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
+  const statusPrefix = scenario.result?.status === Status.FAILED ? "FAILED" : "PASSED";
+  const baseFileName = `${scenario.pickle.name.replace(/\s+/g, "_")}_${this.browserName}_${statusPrefix}_${formattedDateTime}`;
 
-  if (scenario.result?.status === Status.PASSED) {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = (now.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-indexed
-    const day = now.getDate().toString().padStart(2, "0");
-    const hours = now.getHours().toString().padStart(2, "0");
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const seconds = now.getSeconds().toString().padStart(2, "0");
-    const formattedDateTime = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
-    // --- Take Screenshot ---
-    if (this.page) {
-      // Create a unique filename for the screenshot
-      const screenshotFileName = `${scenario.pickle.name.replace(
-        /\s+/g,
-        "-"
-      )}_${this.browserName}_${formattedDateTime}}.png`;
-      const screenshotPath = path.join(screenshotsDir, screenshotFileName);
+  // --- Capture Screenshot ---
+  if (this.page) {
+    const screenshotFileName = `${baseFileName}.png`;
+    const screenshotPath = path.join(screenshotsDir, screenshotFileName);
+
+    try {
       const screenshotBuffer = await this.page.screenshot({
         path: screenshotPath,
+        fullPage: true, // Take a full-page screenshot
       });
       this.attach(screenshotBuffer, "image/png"); // Attach to Cucumber report
       console.log(`Screenshot saved to: ${screenshotPath}`);
+    } catch (error) {
+      console.error(`Failed to take screenshot for scenario "${scenario.pickle.name}":`, error);
     }
   }
-  // --- Clean up browser and context ---
+
+  // --- Handle Video Recording and Renaming ---
+  let originalVideoPath: string | null = null;
+  if (this.page && this.context) {
+    // Get the temporary video path BEFORE closing the context/page
+    originalVideoPath = (await this.page.video()?.path()) || null;
+  }
+
+  // Close context and browser
   if (this.page) {
     await this.page.close();
   }
   if (this.context) {
-    // Close context before browser
-    await this.context.close();
+    await this.context.close(); // Closing context ensures video is saved and finalized
+
+    // Now that the context is closed, the video file should be finalized.
+    // If an original video path was obtained, rename it.
+    if (originalVideoPath && fs.existsSync(originalVideoPath)) {
+      const videoFileName = `${baseFileName}.webm`; // Playwright records in webm format
+      const newVideoPath = path.join(videosDir, videoFileName);
+
+      try {
+        fs.renameSync(originalVideoPath, newVideoPath); // Rename the video file
+        const videoBuffer = fs.readFileSync(newVideoPath);
+        this.attach(videoBuffer, "video/webm"); // Attach renamed video to Cucumber report
+        console.log(`Video saved and attached for scenario: ${newVideoPath}`);
+      } catch (error) {
+        console.error(`Failed to rename or attach video from ${originalVideoPath}:`, error);
+      }
+    } else if (originalVideoPath) {
+      console.warn(`Video file not found at expected path after context close: ${originalVideoPath}`);
+    } else {
+      console.log('No video path was available for this scenario.');
+    }
   }
   if (this.browser) {
     await this.browser.close();
