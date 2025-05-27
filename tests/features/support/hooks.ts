@@ -128,8 +128,11 @@ After(async function (scenario) {
   const minutes = now.getMinutes().toString().padStart(2, "0");
   const seconds = now.getSeconds().toString().padStart(2, "0");
   const formattedDateTime = `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
-  const statusPrefix = scenario.result?.status === Status.FAILED ? "FAILED" : "PASSED";
-  const baseFileName = `${scenario.pickle.name.replace(/\s+/g, "_")}_${this.browserName}_${statusPrefix}_${formattedDateTime}`;
+  const statusPrefix =
+    scenario.result?.status === Status.FAILED ? "FAILED" : "PASSED";
+  const baseFileName = `${scenario.pickle.name.replace(/\s+/g, "_")}_${
+    this.browserName
+  }_${statusPrefix}_${formattedDateTime}`;
 
   // --- Capture Screenshot ---
   if (this.page) {
@@ -144,7 +147,10 @@ After(async function (scenario) {
       this.attach(screenshotBuffer, "image/png"); // Attach to Cucumber report
       console.log(`Screenshot saved to: ${screenshotPath}`);
     } catch (error) {
-      console.error(`Failed to take screenshot for scenario "${scenario.pickle.name}":`, error);
+      console.error(
+        `Failed to take screenshot for scenario "${scenario.pickle.name}":`,
+        error
+      );
     }
   }
 
@@ -174,12 +180,17 @@ After(async function (scenario) {
         this.attach(videoBuffer, "video/webm"); // Attach renamed video to Cucumber report
         console.log(`Video saved and attached for scenario: ${newVideoPath}`);
       } catch (error) {
-        console.error(`Failed to rename or attach video from ${originalVideoPath}:`, error);
+        console.error(
+          `Failed to rename or attach video from ${originalVideoPath}:`,
+          error
+        );
       }
     } else if (originalVideoPath) {
-      console.warn(`Video file not found at expected path after context close: ${originalVideoPath}`);
+      console.warn(
+        `Video file not found at expected path after context close: ${originalVideoPath}`
+      );
     } else {
-      console.log('No video path was available for this scenario.');
+      console.log("No video path was available for this scenario.");
     }
   }
   if (this.browser) {
