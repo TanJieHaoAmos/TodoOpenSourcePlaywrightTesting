@@ -84,7 +84,7 @@ async function setupDeviceBrowser(
   await setupBrowserAndContext.call(this, browserType, contextOptions);
 }
 
-Before({ tags: "@chromium" }, async function (this: World) {
+Before({ tags: "@test_google_chrome_desktop" }, async function (this: World) {
   await setupBrowserAndContext.call(this, chromium);
   this.browserName = "Chromium";
 });

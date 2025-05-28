@@ -1,4 +1,4 @@
-@chromium
+@test_google_chrome_desktop
 Feature: ToDo List
 
   Background:
@@ -7,7 +7,7 @@ Feature: ToDo List
 
   Scenario: Accessing ToDo HomePage
     Then I should see ToDo
-    And the response status code should be 300
+    And the response status code should be 200
 
   Scenario: Adding ToDo
     And I add a ToDo
