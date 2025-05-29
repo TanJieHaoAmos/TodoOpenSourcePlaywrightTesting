@@ -1,25 +1,27 @@
 import { Given, Then, When } from "@cucumber/cucumber";
 import { expect } from "@playwright/test";
 
-Given("I have a web server URL {string}", async function (url) {
+Given("I open the ToDo web app at {string}", async function (url) {
   this.serverUrl = url;
 });
 
-When("I attempt to access the web server", async function () {
+When("I visit the homepage", async function () {
   await this.page.goto(this.serverUrl, {
     waitUntil: "load",
   });
   this.apiResponse = await this.apiContext.get(this.serverUrl);
 });
 
-Then("I should see ToDo", async function () {
-  await expect(this.page.locator("//h1")).toHaveText("Todo List");
+Then("I should see {string}", async function (title: string) {
+  await expect(this.page.locator("//h1")).toHaveText(title);
 });
 
+
 Then(
-  "the response status code should be {int}",
-  async function (expectedStatusCode: number) {
+  "the page should load successfully",
+  async function () {
     if (this.apiResponse) {
+      const expectedStatusCode = 200;
       const actualStatusCode = this.apiResponse.status();
       console.log(
         `Expected status: ${expectedStatusCode}, Actual status: ${actualStatusCode}`

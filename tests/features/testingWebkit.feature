@@ -2,20 +2,19 @@
 Feature: ToDo List
 
   Background:
-    Given I have a web server URL "http://localhost:5173"
-    When I attempt to access the web server
+    Given I open the ToDo web app at "http://localhost:5173"
+    When I visit the homepage
 
-  Scenario: Accessing ToDo HomePage
-    Then I should see ToDo
-    And the response status code should be 200
+  Scenario: Viewing the Home Page
+    Then I should see "Todo List"
+    And the page should load successfully
 
-  Scenario: Adding ToDo
-    And I add a ToDo
-    Then I should see ToDo added
+  Scenario: Adding a New ToDo
+    When I add a new task
+    Then I should see the new task appear in my list
 
-  Scenario: Filtering ToDo
-    And I add a ToDo
-    And I complete the ToDo
-    Then I should see the ToDo under Completed
-
+  Scenario: Filtering Completed ToDos
+    When I add a new task
+    And I mark the task as completed
+    Then I should see it listed under "Completed"
   
