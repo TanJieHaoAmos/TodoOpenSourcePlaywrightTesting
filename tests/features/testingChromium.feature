@@ -2,7 +2,7 @@
 Feature: ToDo List
 
   Background:
-    Given I open the ToDo web app at "http://localhost:5173"
+    Given I open the ToDo web app
     When I visit the homepage
 
   Scenario: Viewing the Home Page

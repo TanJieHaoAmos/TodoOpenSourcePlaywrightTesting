@@ -1,8 +1,8 @@
 import { Given, Then, When } from "@cucumber/cucumber";
 import { expect } from "@playwright/test";
 
-Given("I open the ToDo web app at {string}", async function (url) {
-  this.serverUrl = url;
+Given("I open the ToDo web app", async function () {
+  this.serverUrl = "http://localhost:5173";
 });
 
 When("I visit the homepage", async function () {
