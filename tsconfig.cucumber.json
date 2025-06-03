@@ -1,8 +1,8 @@
 {
   "extends": "./tsconfig.app.json",
   "compilerOptions": {
-    "moduleResolution": "node",
-    "module": "ESNext",
+    "moduleResolution": "nodenext",
+    "module": "esnext",
     "noEmit": true
   },
   "include": ["tests"]

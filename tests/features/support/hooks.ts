@@ -67,6 +67,7 @@ async function setupBrowserAndContext(
     ...contextOptions,
     recordVideo: { dir: videosDir }, // Configure video recording to the 'videosDir'
     locale: "en-US", // Set locale in context options for consistency
+    ignoreHTTPSErrors: true
   });
   this.page = await this.context.newPage();
   this.apiContext = this.page.context().request;
