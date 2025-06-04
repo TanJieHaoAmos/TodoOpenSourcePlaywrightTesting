@@ -2,19 +2,18 @@
   "name": "todo-app-playwright-test",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test:e2e": "playwright test",
-    "test:all": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js",
-    "test:chromium": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js --tags=@test_google_chrome_desktop",
-    "test:firefox": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js --tags=@firefox",
-    "test:webkit": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js --tags=@webkit",
-    "test:pixel5": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js --tags=@pixel5",
-    "test:iphone12": "cross-env NODE_OPTIONS=--loader=ts-node/esm TS_NODE_PROJECT=tsconfig.cucumber.json cucumber-js --tags=@iphone12"
+    "test:chromium": "cucumber-js --tags=@test_google_chrome_desktop",
+    "test:firefox": "cucumber-js --tags=@firefox",
+    "test:webkit": "cucumber-js --tags=@webkit",
+    "test:pixel5": "cucumber-js --tags=@pixel5",
+    "test:iphone12": "cucumber-js --tags=@iphone12",
+    "test:all": "cucumber-js"
   },
   "dependencies": {
     "react": "^19.1.0",

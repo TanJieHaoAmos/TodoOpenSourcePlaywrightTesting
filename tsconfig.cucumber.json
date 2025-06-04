@@ -1,8 +1,9 @@
 {
-  "extends": "./tsconfig.app.json",
   "compilerOptions": {
-    "moduleResolution": "nodenext",
-    "module": "esnext",
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "moduleResolution": "node",
+    "module": "ESNext",
     "noEmit": true
   },
   "include": ["tests"]
